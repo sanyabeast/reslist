@@ -1,0 +1,27 @@
+{
+	"version" : "0.1.0",
+	"name" : "reslist",
+	"author" : {
+		"name" : "Alex Gaivoronski",
+		"email" : "a.gvrnsk@gmail.com"
+	},
+	"repository" : {
+	  	"type" : "git",
+	  	"url" : "https://github.com/sanyabeast/reslist.git"
+	},
+	"dependencies" : {
+		"base": "git://github.com/sanyabeast/basejs.git",
+		"dirwatch": "git://github.com/sanyabeast/dirwatch.git",
+		"requirejs": "latest",
+    "requirejs-text": "latest"
+	},
+	"devDependencies": {
+		"gulp": "latest",
+        "fs-readdir-recursive": "latest",
+        "fs-extra": "latest",
+        "jsonfile": "latest",
+        "colors": "latest",
+        "minimist": "latest",
+        "directory-tree": "latest",
+    }
+}
