@@ -11,7 +11,7 @@ var filePrefix = "::";
 
 jsonfile.readFile(configPath, function(err, obj){
 	if (err){
-		console.log(err.code.red);
+		console.log(err.code.red, err);
 	} else {
 		run(obj);
 	}
