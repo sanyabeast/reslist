@@ -22,6 +22,6 @@
         "jsonfile": "latest",
         "colors": "latest",
         "minimist": "latest",
-        "directory-tree": "latest",
+        "directory-tree": "latest"
     }
 }
