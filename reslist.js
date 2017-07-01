@@ -25,9 +25,9 @@ function run(config){
 
 	for (var k in tasks){
 		make(tasks[k].outputJSON, k, tasks[k].extensions, {
-			readFile : tasks[k].readFile,
-			noName : tasks[k].noName,
-			extensionInName : tasks[k].extensionInName
+			readFile 				: JSON.parse(tasks[k].readFile || "false"),
+			noName 					: JSON.parse(tasks[k].noName || "false"),
+			extensionInName : JSON.parse(tasks[k].extensionInName || "false")
 		})
 	}
 
