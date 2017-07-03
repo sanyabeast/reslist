@@ -27,7 +27,8 @@ function run(config){
 		make(tasks[k].outputJSON, k, tasks[k].extensions, {
 			readFile 				: JSON.parse(tasks[k].readFile || "false"),
 			noName 					: JSON.parse(tasks[k].noName || "false"),
-			extensionInName : JSON.parse(tasks[k].extensionInName || "false")
+			extensionInName : JSON.parse(tasks[k].extensionInName || "false"),
+			extensionInPath : JSON.parse(tasks[k].extensionInPath || "true")
 		})
 	}
 
