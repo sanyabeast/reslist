@@ -11,7 +11,7 @@ var filePrefix = "::";
 
 jsonfile.readFile(configPath, function(err, obj){
 	if (err){
-		console.log(err.code.red, err);
+		console.log("RESLIST".blue, err.code.red, err);
 	} else {
 		run(obj);
 	}
@@ -37,7 +37,7 @@ function run(config){
 /*---------------------------------------------------------------------------------*/
 function writeJSON(path, data){
 	jsonfile.writeFile(path, data, {spaces: 4}, function(err){
-	  	console.log(path.red, "done".yellow, "[" + data.size.toString().green, "bytes".green + "]");
+	  	console.log("RESLIST".blue, path.red, "done".yellow, "[" + data.size.toString().green, "bytes".green + "]");
 	});
 
 }
@@ -46,7 +46,7 @@ function make(/*str*/jsonPath, /*str*/path, /*arr*/exts, /*obj*/options){
 	var tree = directory_tree(path);
 
 	if (!tree){
-		console.log("no such directory".red, path.yellow);
+		console.log("RESLIST".blue, "no such directory".red, path.yellow);
 		return;
 	}
 

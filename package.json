@@ -1,5 +1,5 @@
 {
-	"version" : "0.1.3",
+	"version" : "0.1.4",
 	"name" : "reslist",
 	"author" : {
 		"name" : "Alex Gaivoronski",
@@ -17,11 +17,11 @@
 	},
 	"devDependencies": {
 		"gulp": "latest",
-        "fs-readdir-recursive": "latest",
-        "fs-extra": "latest",
-        "jsonfile": "latest",
-        "colors": "latest",
-        "minimist": "latest",
-        "directory-tree": "latest"
+    "fs-readdir-recursive": "latest",
+    "fs-extra": "latest",
+    "jsonfile": "latest",
+    "colors": "latest",
+    "minimist": "latest",
+    "directory-tree": "latest"
     }
 }
