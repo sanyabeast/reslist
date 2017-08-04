@@ -28,13 +28,21 @@ function run(config){
 			readFile 				: JSON.parse(tasks[k].readFile || "false"),
 			noName 					: JSON.parse(tasks[k].noName || "false"),
 			extensionInName : JSON.parse(tasks[k].extensionInName || "false"),
-			extensionInPath : JSON.parse(tasks[k].extensionInPath || "true")
+			extensionInPath : JSON.parse(tasks[k].extensionInPath || "true"),
+			trim						: JSON.parse(tasks[k].trim || "false")
 		})
 	}
 
 };
 
 /*---------------------------------------------------------------------------------*/
+function superTrim(input){
+	input = input.replace(/\s\s+/g, " ");
+	input = input.replace(/(\r\n|\n|\r)/gm,"");
+	input = input.trim();
+	return input;
+}
+
 function writeJSON(path, data){
 	jsonfile.writeFile(path, data, {spaces: 4}, function(err){
 	  	console.log("RESLIST".blue, path.red, "done".yellow, "[" + data.size.toString().green, "bytes".green + "]");
@@ -76,6 +84,10 @@ function filterIteration(/*obj*/options, /*obj*/dir, /*arr*/exts, /*obj*/target,
 				fs.readFile(item.path, "utf8", function(err, data) {
 					var name = options.extensionInName ? this.name : removeExtension(this);
 					var path = cvrtPath(this);
+
+					if (options.trim){
+						data = superTrim(data);
+					}
 
 					target.count++;
 					target.size += item.size;

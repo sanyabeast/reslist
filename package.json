@@ -10,8 +10,6 @@
 	  	"url" : "https://github.com/sanyabeast/reslist.git"
 	},
 	"dependencies" : {
-		"base": "git://github.com/sanyabeast/basejs.git",
-		"dirwatch": "git://github.com/sanyabeast/dirwatch.git",
 		"requirejs": "latest",
     "requirejs-text": "latest"
 	},
