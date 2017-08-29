@@ -11,7 +11,7 @@ var filePrefix = "::";
 
 jsonfile.readFile(configPath, function(err, obj){
 	if (err){
-		console.log("RESLIST".blue, err.code.red, err);
+		console.log("RESLIST".blue, err.code, err);
 	} else {
 		run(obj);
 	}
@@ -24,17 +24,19 @@ function run(config){
 	var tasks = config.tasks;
 
 	for (var k in tasks){
-		make(tasks[k].outputJSON, k, tasks[k].extensions, {
+		make(tasks[k].output, k, tasks[k].extensions, {
 			readFile 				: JSON.parse(tasks[k].readFile || "false"),
 			noName 					: JSON.parse(tasks[k].noName || "false"),
 			extensionInName : JSON.parse(tasks[k].extensionInName || "false"),
 			extensionInPath : JSON.parse(tasks[k].extensionInPath || "true"),
-			trim						: JSON.parse(tasks[k].trim || "false")
+			trim						: JSON.parse(tasks[k].trim || "false"),
+			outputType : tasks[k].output.split(".")[1]
 		})
 	}
 
 };
 
+/*template*/
 /*---------------------------------------------------------------------------------*/
 function superTrim(input){
 	input = input.replace(/\s\s+/g, " ");
@@ -47,10 +49,22 @@ function writeJSON(path, data){
 	jsonfile.writeFile(path, data, {spaces: 4}, function(err){
 	  	console.log("RESLIST".blue, path.red, "done".yellow, "[" + data.size.toString().green, "bytes".green + "]");
 	});
-
 }
 
-function make(/*str*/jsonPath, /*str*/path, /*arr*/exts, /*obj*/options){
+function writeJS(path, data){
+	//console.log(path, data);
+
+	var fileData = '!function(e,o){if("function"==typeof define&&define.amd)define(o);else if("object"==typeof module&&module.exports)module.exports=o(!0);else{var i=o(),n=new i;window.clavis=n}}(this,function(){ return ' + JSON.stringify(data) + '});'
+
+	fs.writeFile(path, fileData, function (err) {
+	  	if (err) {
+	    	return console.log(err);
+	  	}
+	  	console.log("RESLIST".blue, path.red, "done".yellow, "[" + data.size.toString().green, "bytes".green + "]");
+	});
+}
+
+function make(/*str*/outputPath, /*str*/path, /*arr*/exts, /*obj*/options){
 	var tree = directory_tree(path);
 
 	if (!tree){
@@ -65,8 +79,17 @@ function make(/*str*/jsonPath, /*str*/path, /*arr*/exts, /*obj*/options){
 		total : countFiles(tree, exts)
 	};
 
+	var outputType = outputPath.split(".")[1];
+
 	result = filterIteration(options, tree, exts, result, function(data){
-		writeJSON(jsonPath, data);
+		switch(outputType){
+			case "json":
+				writeJSON(outputPath, data);
+			break;
+			case "js":
+				writeJS(outputPath, data);
+			break;
+		}
 	});
 
 	//console.dir(tree);
@@ -81,30 +104,54 @@ function filterIteration(/*obj*/options, /*obj*/dir, /*arr*/exts, /*obj*/target,
 		if (item.extension && fileMatches(item, exts)){
 
 			if (options.readFile){
-				fs.readFile(item.path, "utf8", function(err, data) {
-					var name = options.extensionInName ? this.name : removeExtension(this);
-					var path = cvrtPath(this);
 
-					if (options.trim){
-						data = superTrim(data);
-					}
-
-					target.count++;
-					target.size += item.size;
-
-					if (options.noName == true){
-						target.content[path + "." + name] = data;
-					} else {
-						target.content[path + "::" + name] = data;
-					}
+				if (options.outputType == "js"){
+					jsonfile.readFile(item.path, function(err, obj){
+						var name = options.extensionInName ? this.name : removeExtension(this);
+						var path = cvrtPath(this);
 
 
-					if (target.total == target.count){
-						delete target.count;
-						onComplete(target);
-					}
+						target.count++;
+						target.size += item.size;
 
-				}.bind(item));
+						if (options.noName == true){
+							target.content[path + "." + name] = obj;
+						} else {
+							target.content[path + "::" + name] = obj;
+						}
+
+
+						if (target.total == target.count){
+							delete target.count;
+							onComplete(target);
+						}
+					}.bind(item));
+				} else {
+					fs.readFile(item.path, "utf8", function(err, data) {
+						var name = options.extensionInName ? this.name : removeExtension(this);
+						var path = cvrtPath(this);
+
+						if (options.trim){
+							data = superTrim(data);
+						}
+
+						target.count++;
+						target.size += item.size;
+
+						if (options.noName == true){
+							target.content[path + "." + name] = data;
+						} else {
+							target.content[path + "::" + name] = data;
+						}
+
+
+						if (target.total == target.count){
+							delete target.count;
+							onComplete(target);
+						}
+
+					}.bind(item));
+				}				
 
 			} else {
 				var name = options.extensionInName ? item.name : removeExtension(item);
