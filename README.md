@@ -37,15 +37,15 @@ reslist.config.json <===
       "outputJSON" : "res/layouts.json",
       "extensions" : ["html"],
       "readFile" : "true",
-    	"extensionInName" : "false",
+      "extensionInName" : "false",
       "trim" : "true"
     },
     "res/graphics" : {
       "outputJSON" : "res/graphics.json",
       "extensions" : ["svg", "jpg", "png"],
       "readFile" : "false",
-    	"noName" : "false",
-    	"extensionInName" : "true"
+      "noName" : "false",
+      "extensionInName" : "true"
     }
   }
 }
