@@ -2,7 +2,7 @@
 
 ```
 +res|
-    +ouput
+    +output
         <empty folder>
     +shaders
         wow.frag
@@ -58,7 +58,7 @@ node ./node_modules/reslist/reslist reslist.config.json
 
 ```
 +res|
-    +ouput
+    +output
         shaders.json <===
         images.json
         layouts.json
