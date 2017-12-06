@@ -8,6 +8,7 @@ var configPath = args[0];
 
 var dirSeparator = ".";
 var filePrefix = "::";
+var baseUrl = "";
 
 jsonfile.readFile(configPath, function(err, obj){
 	if (err){
@@ -20,6 +21,7 @@ jsonfile.readFile(configPath, function(err, obj){
 function run(config){
 	if (config.dirSeparator) dirSeparator = config.dirSeparator;
 	if (config.filePrefix)   filePrefix   = config.filePrefix;
+	if (config.baseUrl)      baseUrl = config.baseUrl;
 
 	var tasks = config.tasks;
 
@@ -115,9 +117,9 @@ function filterIteration(/*obj*/options, /*obj*/dir, /*arr*/exts, /*obj*/target,
 						target.size += item.size;
 
 						if (options.noName == true){
-							target.content[path + "." + name] = obj;
+							target.content[path + dirSeparator + name] = obj;
 						} else {
-							target.content[path + "::" + name] = obj;
+							target.content[path + filePrefix + name] = obj;
 						}
 
 
@@ -192,6 +194,11 @@ function removeExtension(file){
 
 function cvrtPath(file){
 	var path = file.path;
+
+	if (baseUrl){
+		path = path.replace(baseUrl, "");
+	}
+
 	path = path.replace(file.name, "");
 	path = path.replace("assets\\", "");
 	path = path.replace(/\\/g, ".");
