@@ -8,7 +8,6 @@ var configPath = args[0];
 
 var dirSeparator = ".";
 var filePrefix = "::";
-var baseUrl = "";
 
 jsonfile.readFile(configPath, function(err, obj){
 	if (err){
@@ -21,7 +20,6 @@ jsonfile.readFile(configPath, function(err, obj){
 function run(config){
 	if (config.dirSeparator) dirSeparator = config.dirSeparator;
 	if (config.filePrefix)   filePrefix   = config.filePrefix;
-	if (config.baseUrl)      baseUrl = config.baseUrl;
 
 	var tasks = config.tasks;
 
@@ -57,6 +55,9 @@ function writeJS(path, data){
 	//console.log(path, data);
 
 	var fileData = '!function(e,o){if("function"==typeof define&&define.amd)define(o);else if("object"==typeof module&&module.exports)module.exports=o(!0);else{var i=o(),n=new i;window.clavis=n}}(this,function(){ return ' + JSON.stringify(data) + '});'
+
+
+	console.log(data);
 
 	fs.writeFile(path, fileData, function (err) {
 	  	if (err) {
@@ -107,27 +108,59 @@ function filterIteration(/*obj*/options, /*obj*/dir, /*arr*/exts, /*obj*/target,
 
 			if (options.readFile){
 
-				if (options.outputType == "js"){
-					jsonfile.readFile(item.path, function(err, obj){
-						var name = options.extensionInName ? this.name : removeExtension(this);
-						var path = cvrtPath(this);
+				if (options.outputType == "js"){				
+
+					switch(item.extension){
+						case ".json":
+							jsonfile.readFile(item.path, function(err, obj){
+								var name = options.extensionInName ? this.name : removeExtension(this);
+								var path = cvrtPath(this);
 
 
-						target.count++;
-						target.size += item.size;
+								target.count++;
+								target.size += item.size;
 
-						if (options.noName == true){
-							target.content[path + dirSeparator + name] = obj;
-						} else {
-							target.content[path + filePrefix + name] = obj;
-						}
+								if (options.noName == true){
+									target.content[path + "." + name] = obj;
+								} else {
+									target.content[path + "::" + name] = obj;
+								}
 
 
-						if (target.total == target.count){
-							delete target.count;
-							onComplete(target);
-						}
-					}.bind(item));
+								if (target.total == target.count){
+									delete target.count;
+									onComplete(target);
+								}
+							}.bind(item));
+						break;
+						case ".js":
+							fs.readFile(item.path, "utf8", function(err, data) {
+								var name = options.extensionInName ? this.name : removeExtension(this);
+								var path = cvrtPath(this);
+
+								if (options.trim){
+									data = superTrim(data);
+								}
+
+								target.count++;
+								target.size += item.size;
+
+								if (options.noName == true){
+									target.content[path + "." + name] = data;
+								} else {
+									target.content[path + "::" + name] = data;
+								}
+
+								if (target.total == target.count){
+									delete target.count;
+									onComplete(target);
+								}
+
+							}.bind(item));
+						break;
+					}
+
+
 				} else {
 					fs.readFile(item.path, "utf8", function(err, data) {
 						var name = options.extensionInName ? this.name : removeExtension(this);
@@ -194,11 +227,6 @@ function removeExtension(file){
 
 function cvrtPath(file){
 	var path = file.path;
-
-	if (baseUrl){
-		path = path.replace(baseUrl, "");
-	}
-
 	path = path.replace(file.name, "");
 	path = path.replace("assets\\", "");
 	path = path.replace(/\\/g, ".");
