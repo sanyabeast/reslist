@@ -4,18 +4,22 @@ var fs = require("fs");
 var directory_tree = require("directory-tree");
 var jsonfile = require("jsonfile");
 var colors = require("colors");
+var path = require("path");
 var configPath = args[0];
 
 var dirSeparator = ".";
 var filePrefix = "::";
 
-jsonfile.readFile(configPath, function(err, obj){
-	if (err){
-		console.log("RESLIST".blue, err.code, err);
-	} else {
-		run(obj);
-	}
-});
+var config = require(path.resolve(process.cwd(), configPath));
+run(config);
+
+// jsonfile.readFile(configPath, function(err, obj){
+// 	if (err){
+// 		console.log("RESLIST".blue, err.code, err);
+// 	} else {
+// 		run(obj);
+// 	}
+// });
 
 function run(config){
 	if (config.dirSeparator) dirSeparator = config.dirSeparator;
@@ -30,8 +34,9 @@ function run(config){
 			extensionInName : JSON.parse(tasks[k].extensionInName || "false"),
 			extensionInPath : JSON.parse(tasks[k].extensionInPath || "true"),
 			trim						: JSON.parse(tasks[k].trim || "false"),
-			outputType : tasks[k].output.split(".")[1]
-		})
+			outputType : tasks[k].output.split(".")[1],
+			postProcessor : tasks[k].postProcessor
+		});
 	}
 
 };
@@ -56,8 +61,6 @@ function writeJS(path, data){
 
 	var fileData = '!function(e,o){if("function"==typeof define&&define.amd)define(o);else if("object"==typeof module&&module.exports)module.exports=o(!0);else{var i=o(),n=new i;window.clavis=n}}(this,function(){ return ' + JSON.stringify(data) + '});'
 
-
-	console.log(data);
 
 	fs.writeFile(path, fileData, function (err) {
 	  	if (err) {
@@ -85,14 +88,30 @@ function make(/*str*/outputPath, /*str*/path, /*arr*/exts, /*obj*/options){
 	var outputType = outputPath.split(".")[1];
 
 	result = filterIteration(options, tree, exts, result, function(data){
-		switch(outputType){
-			case "json":
-				writeJSON(outputPath, data);
-			break;
-			case "js":
-				writeJS(outputPath, data);
-			break;
+		console.log(options);
+		if (options.postProcessor){
+			data = options.postProcessor(data, function(data){
+				switch(outputType){
+					case "json":
+						writeJSON(outputPath, data);
+					break;
+					case "js":
+						writeJS(outputPath, data);
+					break;
+				}
+			});
+		} else {
+			switch(outputType){
+				case "json":
+					writeJSON(outputPath, data);
+				break;
+				case "js":
+					writeJS(outputPath, data);
+				break;
+			}
 		}
+
+		
 	});
 
 	//console.dir(tree);
@@ -169,6 +188,7 @@ function filterIteration(/*obj*/options, /*obj*/dir, /*arr*/exts, /*obj*/target,
 						if (options.trim){
 							data = superTrim(data);
 						}
+
 
 						target.count++;
 						target.size += item.size;
